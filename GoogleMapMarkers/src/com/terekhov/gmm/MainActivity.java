@@ -17,7 +17,8 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity {
 
-	private final int RQS_GooglePlayServices = 100;
+	private static final String TAG = "MainActivity";
+	private static final int RQS_GooglePlayServices = 100;
 
 	// Google Map
 	private GoogleMap mGoogleMap;
@@ -44,12 +45,12 @@ public class MainActivity extends FragmentActivity {
 					e.printStackTrace();
 
 					Toast.makeText(getApplicationContext(),
-							"Sorry! unable to create maps", Toast.LENGTH_SHORT)
+							R.string.error_create_maps, Toast.LENGTH_SHORT)
 							.show();
 				}
 			}
 		} catch (Exception e) {
-			Log.e("Error: GooglePlayServiceUtil: ", "" + e);
+			Log.e(TAG, "Error: GooglePlayServiceUtil: " + e);
 		}
 
 	}
@@ -71,19 +72,7 @@ public class MainActivity extends FragmentActivity {
 							mGoogleMap.setMyLocationEnabled(true);
 						}
 
-						// GREEN color marker
-						addDefaultMarker(37.6155600, 55.7522200,
-								BitmapDescriptorFactory.HUE_GREEN);
-
-						// BLUE color marker
-						addDefaultMarker(37.6155600, 55.9522200,
-								BitmapDescriptorFactory.HUE_BLUE);
-
-						// add custom marker
-						addMarker(37.8155600, 55.5522200, R.drawable.map_marker);
-						
-						// add custom marker
-						addMarker(37.5155600, 55.5522200, R.drawable.google_map_markers); 
+						testAddCustomMarkers();
 					}
 				}
 			}
@@ -96,34 +85,54 @@ public class MainActivity extends FragmentActivity {
 		setUpMapIfNeeded();
 	}
 
+	private void testAddCustomMarkers() {
+		// GREEN color marker
+		addDefaultMarker(37.6155600, 55.7522200,
+				BitmapDescriptorFactory.HUE_GREEN);
+
+		// BLUE color marker
+		addDefaultMarker(37.6155600, 55.9522200,
+				BitmapDescriptorFactory.HUE_BLUE);
+
+		// add custom marker
+		addMarker(37.8155600, 55.5522200, R.drawable.map_marker);
+
+		// add custom marker
+		addMarker(37.5155600, 55.5522200, R.drawable.google_map_markers);
+	}
+
 	private void addDefaultMarker(double lon, double lat, float hue) {
-		if (mGoogleMap != null) {
-
-			LatLng currentPosition = new LatLng(lat, lon);
-
-			mGoogleMap.addMarker(new MarkerOptions()
-					.position(currentPosition)
-					.title(String.format("longitude: %f; latitude: %f", lon,
-							lat))
-					.icon(BitmapDescriptorFactory.defaultMarker(hue)));
+		if (mGoogleMap == null) {
+			Log.w(TAG, "GoogleMap is not initialized");
+			return;
 		}
+
+		LatLng currentPosition = new LatLng(lat, lon);
+
+		mGoogleMap.addMarker(new MarkerOptions()
+				.position(currentPosition)
+				.title(String.format(
+						getResources().getString(R.string.marker_baloon), lon,
+						lat)).icon(BitmapDescriptorFactory.defaultMarker(hue)));
 	}
 
 	private void addMarker(double lon, double lat, int resourceId) {
-		if (mGoogleMap != null) {
-
-			LatLng currentPosition = new LatLng(lat, lon);
-
-			mGoogleMap.addMarker(new MarkerOptions()
-					.position(currentPosition)
-					.title(String.format("longitude: %f; latitude: %f", lon,
-							lat))
-					.icon(BitmapDescriptorFactory.fromResource(resourceId)));
-
-			mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-					currentPosition, 10));
-			mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(8), 2000, null);
+		if (mGoogleMap == null) {
+			Log.w(TAG, "GoogleMap is not initialized");
+			return;
 		}
-	}
 
+		LatLng currentPosition = new LatLng(lat, lon);
+
+		mGoogleMap.addMarker(new MarkerOptions()
+				.position(currentPosition)
+				.title(String.format(
+						getResources().getString(R.string.marker_baloon), lon,
+						lat))
+				.icon(BitmapDescriptorFactory.fromResource(resourceId)));
+
+		mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+				currentPosition, 10));
+		mGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(8), 2000, null);
+	}
 }
